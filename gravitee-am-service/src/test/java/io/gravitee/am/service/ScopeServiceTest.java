@@ -15,39 +15,28 @@
  */
 package io.gravitee.am.service;
 
-import io.gravitee.am.model.Client;
+import io.gravitee.am.model.Application;
 import io.gravitee.am.model.Domain;
 import io.gravitee.am.model.Role;
+import io.gravitee.am.model.application.ApplicationOAuthSettings;
+import io.gravitee.am.model.application.ApplicationSettings;
 import io.gravitee.am.model.oauth2.Scope;
 import io.gravitee.am.repository.exceptions.TechnicalException;
 import io.gravitee.am.repository.management.api.ScopeRepository;
 import io.gravitee.am.repository.oauth2.api.ScopeApprovalRepository;
 import io.gravitee.am.service.exception.*;
 import io.gravitee.am.service.impl.ScopeServiceImpl;
-import io.gravitee.am.service.model.NewScope;
-import io.gravitee.am.service.model.PatchClient;
-import io.gravitee.am.service.model.PatchScope;
-import io.gravitee.am.service.model.UpdateRole;
-import io.gravitee.am.service.model.UpdateScope;
-import io.gravitee.am.service.model.UpdateSystemScope;
+import io.gravitee.am.service.model.*;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -69,7 +58,7 @@ public class ScopeServiceTest {
     private RoleService roleService;
 
     @Mock
-    private ClientService clientService;
+    private ApplicationService applicationService;
 
     @Mock
     private ScopeRepository scopeRepository;
@@ -513,7 +502,7 @@ public class ScopeServiceTest {
         Scope scope = mock(Scope.class);
         when(scope.getDomain()).thenReturn(DOMAIN);
         when(roleService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.emptySet()));
-        when(clientService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.emptySet()));
+        when(applicationService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.emptySet()));
         when(scopeRepository.findById("my-scope")).thenReturn(Maybe.just(scope));
         when(scopeRepository.delete("my-scope")).thenReturn(Completable.complete());
         when(scopeApprovalRepository.deleteByDomainAndScopeKey(scope.getDomain(), scope.getKey())).thenReturn(Completable.complete());
@@ -526,7 +515,7 @@ public class ScopeServiceTest {
         testObserver.assertNoErrors();
 
         verify(roleService, times(1)).findByDomain(DOMAIN);
-        verify(clientService, times(1)).findByDomain(DOMAIN);
+        verify(applicationService, times(1)).findByDomain(DOMAIN);
         verify(scopeRepository, times(1)).delete("my-scope");
         verify(domainService, times(1)).reload(any(), any());
     }
@@ -541,14 +530,18 @@ public class ScopeServiceTest {
         when(role.getId()).thenReturn("role-1");
         when(role.getPermissions()).thenReturn(new LinkedList<>(Arrays.asList("my-scope")));
 
-        Client client = mock(Client.class);
-        when(client.getId()).thenReturn("client-1");
-        when(client.getScopes()).thenReturn(new LinkedList<>(Arrays.asList("my-scope")));
+        Application application = mock(Application.class);
+
+        ApplicationSettings applicationSettings = mock(ApplicationSettings.class);
+        ApplicationOAuthSettings applicationOAuthSettings = mock(ApplicationOAuthSettings.class);
+        when(applicationOAuthSettings.getScopes()).thenReturn(new LinkedList<>(Arrays.asList("my-scope")));
+        when(applicationSettings.getOauth()).thenReturn(applicationOAuthSettings);
+        when(application.getSettings()).thenReturn(applicationSettings);
 
         when(roleService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(role)));
-        when(clientService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(client)));
+        when(applicationService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(application)));
         when(roleService.update(anyString(), anyString(), any(UpdateRole.class))).thenReturn(Single.just(new Role()));
-        when(clientService.patch(anyString(),anyString(),any(PatchClient.class))).thenReturn(Single.just(new Client()));
+        when(applicationService.update(any())).thenReturn(Single.just(new Application()));
         when(scopeRepository.findById("my-scope")).thenReturn(Maybe.just(scope));
         when(scopeRepository.delete("my-scope")).thenReturn(Completable.complete());
         when(scopeApprovalRepository.deleteByDomainAndScopeKey(scope.getDomain(), scope.getKey())).thenReturn(Completable.complete());
@@ -561,9 +554,9 @@ public class ScopeServiceTest {
         testObserver.assertNoErrors();
 
         verify(roleService, times(1)).findByDomain(DOMAIN);
-        verify(clientService, times(1)).findByDomain(DOMAIN);
+        verify(applicationService, times(1)).findByDomain(DOMAIN);
         verify(roleService, times(1)).update(anyString(), anyString(), any(UpdateRole.class));
-        verify(clientService, times(1)).patch(anyString(), anyString(), any(PatchClient.class));
+        verify(applicationService, times(1)).update(any());
         verify(scopeRepository, times(1)).delete("my-scope");
         verify(domainService, times(1)).reload(any(), any());
     }

@@ -15,7 +15,6 @@
  */
 package io.gravitee.am.service;
 
-import io.gravitee.am.model.Client;
 import io.gravitee.am.model.Domain;
 import io.gravitee.am.model.ExtensionGrant;
 import io.gravitee.am.repository.exceptions.TechnicalException;
@@ -57,7 +56,7 @@ public class ExtensionGrantServiceTest {
     private DomainService domainService;
 
     @Mock
-    private ClientService clientService;
+    private ApplicationService applicationService;
 
     @Mock
     private ExtensionGrantRepository extensionGrantRepository;
@@ -242,7 +241,7 @@ public class ExtensionGrantServiceTest {
         testObserver.assertError(ExtensionGrantNotFoundException.class);
         testObserver.assertNotComplete();
 
-        verify(clientService, never()).findByDomainAndExtensionGrant(eq(DOMAIN), anyString());
+        verify(applicationService, never()).findByDomainAndExtensionGrant(eq(DOMAIN), anyString());
         verify(extensionGrantRepository, never()).delete(anyString());
     }
 
@@ -275,7 +274,7 @@ public class ExtensionGrantServiceTest {
         when(existingExtensionGrant.getGrantType()).thenReturn("my-extension-grant");
         when(extensionGrantRepository.findById("my-extension-grant")).thenReturn(Maybe.just(existingExtensionGrant));
         when(extensionGrantRepository.delete("my-extension-grant")).thenReturn(Completable.complete());
-        when(clientService.findByDomainAndExtensionGrant(DOMAIN, "my-extension-grant")).thenReturn(Single.just(Collections.emptySet()));
+        when(applicationService.findByDomainAndExtensionGrant(DOMAIN, "my-extension-grant")).thenReturn(Single.just(Collections.emptySet()));
         when(domainService.reload(eq(DOMAIN), any())).thenReturn(Single.just(new Domain()));
 
         TestObserver testObserver = extensionGrantService.delete(DOMAIN, "my-extension-grant").test();

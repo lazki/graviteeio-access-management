@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "583cba4d-3351-44a3-a3e8-a99d88e2b448",
+		"_postman_id": "27a8c7ad-3dce-4dee-8459-a58a98e591fd",
 		"name": "Gravitee.io - AM - Openid DCR",
 		"description": "Test openid connect dynamc client registration specifications: https://openid.net/specs/openid-connect-registration-1_0.html",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -255,10 +255,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{management_url}}/management/domains/{{domain}}/certificates",
 							"host": [
@@ -520,10 +516,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{gateway_url}}/{{domain}}/oidc/.well-known/openid-configuration",
 							"host": [
@@ -747,10 +739,6 @@
 								"value": "Bearer {{registrationAccessToken}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{registrationClientUri}}",
 							"host": [
@@ -3756,10 +3744,6 @@
 										"value": "Bearer {{registrationAccessToken}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{registrationClientUri}}",
 									"host": [
@@ -4108,10 +4092,6 @@
 										"value": "Bearer {{registrationAccessToken}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{registrationClientUri}}",
 									"host": [
@@ -4580,10 +4560,6 @@
 										"value": "Bearer {{registrationAccessToken}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{registrationClientUri}}",
 									"host": [
@@ -4996,7 +4972,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"redirectUris\": [\"https://gravitee.io/callback\"],\n  \"authorizedGrantTypes\": [\"implicit\"],\n  \"responseTypes\": [\"token\"],\n  \"applicationType\": \"Single Page App\",\n  \"template\": true\n}"
+							"raw": "{\n  \"redirectUris\": [\"https://gravitee.io/callback\"],\n  \"authorizedGrantTypes\": [\"implicit\"],\n  \"responseTypes\": [\"token\"],\n  \"applicationType\": \"web\",\n  \"template\": true\n}"
 						},
 						"url": {
 							"raw": "{{management_url}}/management/domains/{{domain}}/clients/{{templateId}}",
@@ -5197,10 +5173,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{gateway_url}}/{{domain}}/oidc/.well-known/openid-configuration",
 							"host": [
@@ -5241,10 +5213,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{registrationTemplatesEndpoint}}",
 							"host": [
@@ -5268,7 +5236,7 @@
 									"",
 									"pm.test(\"Has template attributes values\", function () {",
 									"    var body = pm.response.json();",
-									"    pm.expect(body.application_type).to.eql('Single Page App');",
+									"    pm.expect(body.application_type).to.eql('web');",
 									"    pm.expect(body.response_types).to.eql(['token']);",
 									"    pm.expect(body.grant_types).to.eql(['implicit']);",
 									"",
@@ -5350,10 +5318,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{management_url}}/management/domains/{{domain}}/clients/{{newClientForDCRTests}}/forms?template=LOGIN",
 							"host": [
@@ -5413,10 +5377,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{management_url}}/management/domains/{{domain}}/clients/{{newClientForDCRTests}}/forms?template=ERROR",
 							"host": [
@@ -5471,10 +5431,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{management_url}}/management/domains/{{domain}}/clients/{{newClientForDCRTests}}/forms?template=OAUTH2_USER_CONSENT",
 							"host": [
@@ -5537,10 +5493,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{management_url}}/management/domains/{{domain}}/clients/{{newClientForDCRTests}}/emails?template=REGISTRATION_CONFIRMATION",
 							"host": [
@@ -5607,10 +5559,6 @@
 								"value": "Bearer {{registrationAccessToken}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{registrationClientUri}}",
 							"host": [
@@ -23500,10 +23448,6 @@
 								"value": "Bearer {{access_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{userinfoEndpoint}}",
 							"host": [
@@ -23722,10 +23666,6 @@
 								"value": "Bearer {{access_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{userinfoEndpoint}}",
 							"host": [

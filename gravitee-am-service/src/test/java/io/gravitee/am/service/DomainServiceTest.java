@@ -24,7 +24,10 @@ import io.gravitee.am.service.exception.DomainDeleteMasterException;
 import io.gravitee.am.service.exception.DomainNotFoundException;
 import io.gravitee.am.service.exception.TechnicalManagementException;
 import io.gravitee.am.service.impl.DomainServiceImpl;
-import io.gravitee.am.service.model.*;
+import io.gravitee.am.service.model.NewDomain;
+import io.gravitee.am.service.model.NewSystemScope;
+import io.gravitee.am.service.model.PatchDomain;
+import io.gravitee.am.service.model.UpdateDomain;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -107,7 +110,7 @@ public class DomainServiceTest {
     private DomainRepository domainRepository;
 
     @Mock
-    private ClientService clientService;
+    private ApplicationService applicationService;
 
     @Mock
     private CertificateService certificateService;
@@ -388,22 +391,20 @@ public class DomainServiceTest {
 
     @Test
     public void shouldDelete() {
-        Client mockClient1 = new Client();
-        mockClient1.setId("client-1");
-        mockClient1.setClientId("client-1");
+        Application mockApp1 = new Application();
+        mockApp1.setId("client-1");
 
-        Client mockClient2 = new Client();
-        mockClient2.setId("client-2");
-        mockClient2.setClientId("client-2");
+        Application mockApp2 = new Application();
+        mockApp2.setId("client-2");
 
-        Set<Client> mockClients = new HashSet<>();
-        mockClients.add(mockClient1);
-        mockClients.add(mockClient2);
+        Set<Application> mockApplications = new HashSet<>();
+        mockApplications.add(mockApp1);
+        mockApplications.add(mockApp2);
 
         when(domainRepository.findById(DOMAIN_ID)).thenReturn(Maybe.just(domain));
         when(domainRepository.delete(DOMAIN_ID)).thenReturn(Completable.complete());
-        when(clientService.findByDomain(DOMAIN_ID)).thenReturn(Single.just(mockClients));
-        when(clientService.delete(anyString())).thenReturn(Completable.complete());
+        when(applicationService.findByDomain(DOMAIN_ID)).thenReturn(Single.just(mockApplications));
+        when(applicationService.delete(anyString())).thenReturn(Completable.complete());
         when(certificate.getId()).thenReturn(CERTIFICATE_ID);
         when(certificateService.findByDomain(DOMAIN_ID)).thenReturn(Single.just(Collections.singletonList(certificate)));
         when(certificateService.delete(anyString())).thenReturn(Completable.complete());
@@ -444,7 +445,7 @@ public class DomainServiceTest {
         testObserver.assertNoErrors();
         testObserver.assertComplete();
 
-        verify(clientService, times(2)).delete(anyString());
+        verify(applicationService, times(2)).delete(anyString());
         verify(certificateService, times(1)).delete(CERTIFICATE_ID);
         verify(identityProviderService, times(1)).delete(DOMAIN_ID, IDP_ID);
         verify(extensionGrantService, times(1)).delete(DOMAIN_ID, EXTENSION_GRANT_ID);
@@ -462,7 +463,7 @@ public class DomainServiceTest {
     public void shouldDeleteWithoutRelatedData() {
         when(domainRepository.findById(DOMAIN_ID)).thenReturn(Maybe.just(domain));
         when(domainRepository.delete(DOMAIN_ID)).thenReturn(Completable.complete());
-        when(clientService.findByDomain(DOMAIN_ID)).thenReturn(Single.just(Collections.emptySet()));
+        when(applicationService.findByDomain(DOMAIN_ID)).thenReturn(Single.just(Collections.emptySet()));
         when(certificateService.findByDomain(DOMAIN_ID)).thenReturn(Single.just(Collections.emptyList()));
         when(identityProviderService.findByDomain(DOMAIN_ID)).thenReturn(Single.just(Collections.emptyList()));
         when(extensionGrantService.findByDomain(DOMAIN_ID)).thenReturn(Single.just(Collections.emptyList()));
@@ -481,7 +482,7 @@ public class DomainServiceTest {
         testObserver.assertComplete();
         testObserver.assertNoErrors();
 
-        verify(clientService, never()).delete(anyString());
+        verify(applicationService, never()).delete(anyString());
         verify(certificateService, never()).delete(anyString());
         verify(identityProviderService, never()).delete(anyString(), anyString());
         verify(extensionGrantService, never()).delete(anyString(), anyString());
@@ -527,7 +528,7 @@ public class DomainServiceTest {
     @Test
     public void shouldDelete2_technicalException() {
         when(domainRepository.findById(DOMAIN_ID)).thenReturn(Maybe.just(domain));
-        when(clientService.findByDomain(DOMAIN_ID)).thenReturn(Single.error(TechnicalException::new));
+        when(applicationService.findByDomain(DOMAIN_ID)).thenReturn(Single.error(TechnicalException::new));
 
         TestObserver testObserver = domainService.delete(DOMAIN_ID).test();
 

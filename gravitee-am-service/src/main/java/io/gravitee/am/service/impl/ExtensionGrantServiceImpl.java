@@ -24,8 +24,8 @@ import io.gravitee.am.model.common.event.Event;
 import io.gravitee.am.model.common.event.Payload;
 import io.gravitee.am.model.common.event.Type;
 import io.gravitee.am.repository.management.api.ExtensionGrantRepository;
+import io.gravitee.am.service.ApplicationService;
 import io.gravitee.am.service.AuditService;
-import io.gravitee.am.service.ClientService;
 import io.gravitee.am.service.DomainService;
 import io.gravitee.am.service.ExtensionGrantService;
 import io.gravitee.am.service.exception.*;
@@ -62,7 +62,7 @@ public class ExtensionGrantServiceImpl implements ExtensionGrantService {
     private ExtensionGrantRepository extensionGrantRepository;
 
     @Autowired
-    private ClientService clientService;
+    private ApplicationService applicationService;
 
     @Autowired
     private DomainService domainService;
@@ -187,10 +187,10 @@ public class ExtensionGrantServiceImpl implements ExtensionGrantService {
         LOGGER.debug("Delete extension grant {}", extensionGrantId);
         return extensionGrantRepository.findById(extensionGrantId)
                 .switchIfEmpty(Maybe.error(new ExtensionGrantNotFoundException(extensionGrantId)))
-                .flatMapSingle(extensionGrant -> clientService.findByDomainAndExtensionGrant(domain, extensionGrant.getGrantType())
-                        .flatMap(clients -> {
-                            if (clients.size() > 0) {
-                                throw new ExtensionGrantWithClientsException();
+                .flatMapSingle(extensionGrant -> applicationService.findByDomainAndExtensionGrant(domain, extensionGrant.getGrantType())
+                        .flatMap(applications -> {
+                            if (applications.size() > 0) {
+                                throw new ExtensionGrantWithApplicationsException();
                             }
                             return Single.just(extensionGrant);
                         }))
